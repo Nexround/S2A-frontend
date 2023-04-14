@@ -5,11 +5,9 @@
         <n-upload action="http://localhost:5000/upload" :max="1" accept="image/png, image/jpeg" name="image"
           @finish="onFinish">
           <n-upload-dragger id="upload">
-            <div style="margin-bottom: 12px">
-              <n-icon size="60" :depth="3">
-                <ArchiveOutline />
-              </n-icon>
-            </div>
+            <Icon size="60" color="gray" style="margin-bottom: 12px">
+              <ArchiveOutline />
+            </Icon>
             <n-p depth="3" style="font-size: 16px;margin: 8px 0 0 0">
               点击或者拖动文件到该区域来上传
             </n-p>
@@ -17,31 +15,30 @@
         </n-upload>
       </n-gi>
       <n-gi>
-        <n-image v-if="imageUrl"
-          :src="imageUrl" />
+        <n-image v-if="imageUrl" :src="imageUrl" />
         <div v-else id="placeholder">
           <Icon size="60" color="gray" style="margin-bottom: 12px">
             <FlowerOutline />
           </Icon>
           <n-p depth="3" style="font-size: 16px;margin: 8px 0 0 0">
-              预览区域
-            </n-p>
+            预览区域
+          </n-p>
         </div>
 
       </n-gi>
     </n-grid>
     <div class="full-width">
       <n-button v-if='imageUrl' type="info" @click="download">
-        <Icon>
+        <Icon size="20" style="margin-right: 5px">
           <CloudDownloadOutline />
         </Icon>
-         下载
+        下载
       </n-button>
       <n-button v-else disabled type="info">
-        <Icon>
+        <Icon size="20" style="margin-right: 5px">
           <CloudDownloadOutline />
         </Icon>
-         下载
+        下载
       </n-button>
     </div>
   </n-card>
@@ -49,7 +46,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { ArchiveOutline, FlowerOutline, CloudDownloadOutline} from '@vicons/ionicons5'
+import { ArchiveOutline, FlowerOutline, CloudDownloadOutline } from '@vicons/ionicons5'
 import { Icon } from '@vicons/utils'
 import axios from 'axios'
 import type { UploadFileInfo } from 'naive-ui'
@@ -95,9 +92,15 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.n-card{
+.n-image{
+  border-radius: 3px;
+}
+.n-button {}
+
+.n-card {
   box-shadow: 10px 10px 120px rgba(201, 201, 201, 0.63);
 }
+
 #upload {
   width: 256px;
   height: 256px;
@@ -120,8 +123,8 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #d9d9d9;
-  background-color: #ececec;
-  border-radius: 5px;
+  border: 1px dashed #dadada;
+  background-color: #fafafc;
+  border-radius: 3px;
 }
 </style>
