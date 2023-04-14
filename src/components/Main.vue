@@ -1,108 +1,127 @@
 <template>
   <n-card title="Selfie2Anime">
-    <n-grid cols="2" x-gap="30">
-      <n-grid-item>
-        <n-upload action="http://localhost:5000/upload" :max="1">
-          <n-upload-dragger>
+    <n-grid cols="2" x-gap="30" style="margin-bottom: 12px;">
+      <n-gi>
+        <n-upload action="http://localhost:5000/upload" :max="1" accept="image/png, image/jpeg" name="image"
+          @finish="onFinish">
+          <n-upload-dragger id="upload">
             <div style="margin-bottom: 12px">
-              <n-icon size="48" :depth="3">
-                <archive-icon />
+              <n-icon size="60" :depth="3">
+                <ArchiveOutline />
               </n-icon>
             </div>
-            <n-text style="font-size: 16px">
+            <n-p depth="3" style="font-size: 16px;margin: 8px 0 0 0">
               点击或者拖动文件到该区域来上传
-            </n-text>
-            <n-p depth="3" style="margin: 8px 0 0 0">
-              请不要上传敏感数据，比如你的银行卡号和密码，信用卡号有效期和安全码
             </n-p>
           </n-upload-dragger>
         </n-upload>
-      </n-grid-item>
-      <n-grid-item>
-        <n-image v-if="imageUrl" width="256px" height="256px"
-          src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" />
+      </n-gi>
+      <n-gi>
+        <n-image v-if="imageUrl"
+          :src="imageUrl" />
         <div v-else id="placeholder">
-          <Icon size="60" color="gray">
+          <Icon size="60" color="gray" style="margin-bottom: 12px">
             <FlowerOutline />
           </Icon>
+          <n-p depth="3" style="font-size: 16px;margin: 8px 0 0 0">
+              预览区域
+            </n-p>
         </div>
 
-      </n-grid-item>
+      </n-gi>
     </n-grid>
     <div class="full-width">
-      <n-button type="info">
-      下载
-    </n-button>
+      <n-button v-if='imageUrl' type="info" @click="download">
+        <Icon>
+          <CloudDownloadOutline />
+        </Icon>
+         下载
+      </n-button>
+      <n-button v-else disabled type="info">
+        <Icon>
+          <CloudDownloadOutline />
+        </Icon>
+         下载
+      </n-button>
     </div>
   </n-card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { ArchiveOutline as ArchiveIcon, FlowerOutline } from '@vicons/ionicons5'
+import { ArchiveOutline, FlowerOutline, CloudDownloadOutline} from '@vicons/ionicons5'
 import { Icon } from '@vicons/utils'
 import axios from 'axios'
+import type { UploadFileInfo } from 'naive-ui'
+
 const instance = axios.create({
   baseURL: 'http://localhost:5000',
 });
 export default defineComponent({
   components: {
-    ArchiveIcon,
+    ArchiveOutline,
     FlowerOutline,
-    Icon
+    Icon,
+    CloudDownloadOutline
   },
   data() {
     return {
-      selectedFile: null as File | null,
       imageUrl: null as string | null,
+      fileName: null as string | null,
     };
   },
   methods: {
-    onFileSelected(event: InputEvent) {
-      const files = (event.target as HTMLInputElement).files;
-      if (files && files.length > 0) {
-        this.selectedFile = files[0];
-        this.imageUrl = URL.createObjectURL(this.selectedFile);
-      }
+    async onFinish({
+      file,
+      event
+    }: {
+      file: UploadFileInfo
+      event?: ProgressEvent
+    }) {
+      this.fileName = file.name;
+      const response = await instance.get('/result/' + file.name, { responseType: 'blob' });
+      this.imageUrl = URL.createObjectURL(response.data);
+
     },
-    async upload() {
-      if (this.selectedFile) {
-        const formData = new FormData();
-        formData.append('file', this.selectedFile);
-        try {
-          const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData,
-          });
-          const result = await response.json();
-          console.log(result);
-        } catch (error) {
-          console.error(error);
-        }
+    download() {
+      if (this.imageUrl) {
+        const link = document.createElement('a');
+        link.href = this.imageUrl;
+        link.setAttribute('download', 'result.jpg');
+        link.click();
       }
-    },
+    }
   },
 });
 </script>
 <style scoped>
-.n-upload-dragger {
+.n-card{
+  box-shadow: 10px 10px 120px rgba(201, 201, 201, 0.63);
+}
+#upload {
   width: 256px;
   height: 256px;
-  text-align: center;
-  border: 1px dashed #d9d9d9;
-  border-radius: 2px;
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
+
 .full-width {
   width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
+
 #placeholder {
   width: 256px;
   height: 256px;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   border: 1px dashed #d9d9d9;
-  background-color: #e6e6e4;
+  background-color: #ececec;
   border-radius: 5px;
 }
 </style>
