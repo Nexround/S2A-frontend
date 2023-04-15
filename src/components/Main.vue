@@ -1,9 +1,15 @@
 <template>
   <n-card title="Selfie2Anime">
+    <template #footer>
+      <n-divider />
+      <n-p depth="3">
+        Tip: 上传正方形照片以获得最佳效果
+      </n-p>
+    </template>
     <n-grid cols="1 m:2 l:2 xl:2 2xl:2" responsive="screen" x-gap="30" style="margin-bottom: 12px;">
       <n-gi>
         <n-upload action="/upload" :max="1" accept="image/png, image/jpeg" name="image" @finish="onFinish"
-          create-thumbnail-url>
+          list-type="image">
           <n-upload-dragger id="upload">
             <Icon size="60" color="gray" style="margin-bottom: 12px">
               <ArchiveOutline />
@@ -26,6 +32,7 @@
         </div>
 
       </n-gi>
+
     </n-grid>
     <div class="full-width">
       <n-button v-if='imageUrl' type="info" @click="download">
@@ -86,9 +93,6 @@ export default defineComponent({
         link.click();
       }
     },
-    createThumbnailUrl(file: File) {
-      return URL.createObjectURL(file);
-    }
   },
 });
 </script>
