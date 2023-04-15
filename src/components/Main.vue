@@ -1,9 +1,9 @@
 <template>
   <n-card title="Selfie2Anime">
-    <n-grid cols="2" x-gap="30" style="margin-bottom: 12px;">
+    <n-grid cols="1 m:2 l:2 xl:2 2xl:2" responsive="screen" x-gap="30" style="margin-bottom: 12px;">
       <n-gi>
-        <n-upload action="http://localhost:5000/upload" :max="1" accept="image/png, image/jpeg" name="image"
-          @finish="onFinish">
+        <n-upload action="/upload" :max="1" accept="image/png, image/jpeg" name="image" @finish="onFinish"
+          create-thumbnail-url>
           <n-upload-dragger id="upload">
             <Icon size="60" color="gray" style="margin-bottom: 12px">
               <ArchiveOutline />
@@ -51,9 +51,6 @@ import { Icon } from '@vicons/utils'
 import axios from 'axios'
 import type { UploadFileInfo } from 'naive-ui'
 
-const instance = axios.create({
-  baseURL: 'http://localhost:5000',
-});
 export default defineComponent({
   components: {
     ArchiveOutline,
@@ -68,7 +65,7 @@ export default defineComponent({
     };
   },
   methods: {
-    async onFinish({
+    onFinish({
       file,
       event
     }: {
@@ -76,8 +73,9 @@ export default defineComponent({
       event?: ProgressEvent
     }) {
       this.fileName = file.name;
-      const response = await instance.get('/result/' + file.name, { responseType: 'blob' });
-      this.imageUrl = URL.createObjectURL(response.data);
+      axios.get('/result/' + file.name, { responseType: 'blob' }).then(response => {
+        this.imageUrl = URL.createObjectURL(response.data);
+      });
 
     },
     download() {
@@ -87,14 +85,18 @@ export default defineComponent({
         link.setAttribute('download', 'result.jpg');
         link.click();
       }
+    },
+    createThumbnailUrl(file: File) {
+      return URL.createObjectURL(file);
     }
   },
 });
 </script>
 <style scoped>
-.n-image{
+.n-image {
   border-radius: 3px;
 }
+
 .n-button {}
 
 .n-card {
